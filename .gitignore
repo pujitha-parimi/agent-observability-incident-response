@@ -1,0 +1,29 @@
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache and test files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and runtime files
+logs/
+runtime/
+
+# Local database and Prometheus data
+data/
+prometheus/data/
+prometheus/prometheus/data/
+prometheus/prometheus/queries.active
+prometheus/prometheus/lock
+
+# Downloaded Prometheus executables
+prometheus/prometheus/prometheus.exe
+prometheus/prometheus/promtool.exe

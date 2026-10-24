@@ -1,0 +1,57 @@
+rule_files:
+  - ../docs/alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'agent_requests_total{status="error"}'
+        values: '0+1x8'
+      - series: 'agent_tool_failures_total{tool_name="retrieval",status="error"}'
+        values: '0+1x8'
+      - series: 'agent_request_latency_seconds_bucket{le="0.05"}'
+        values: '0+0x8'
+      - series: 'agent_request_latency_seconds_bucket{le="0.1"}'
+        values: '0+0x8'
+      - series: 'agent_request_latency_seconds_bucket{le="0.25"}'
+        values: '0+0x8'
+      - series: 'agent_request_latency_seconds_bucket{le="0.5"}'
+        values: '0+0x8'
+      - series: 'agent_request_latency_seconds_bucket{le="1.0"}'
+        values: '0+0x8'
+      - series: 'agent_request_latency_seconds_bucket{le="2.0"}'
+        values: '0+0x8'
+      - series: 'agent_request_latency_seconds_bucket{le="5.0"}'
+        values: '0+1x8'
+      - series: 'agent_request_latency_seconds_bucket{le="10.0"}'
+        values: '0+1x8'
+      - series: 'agent_request_latency_seconds_bucket{le="30.0"}'
+        values: '0+1x8'
+      - series: 'agent_request_latency_seconds_bucket{le="+Inf"}'
+        values: '0+1x8'
+    alert_rule_test:
+      - eval_time: 8m
+        alertname: AgentHighErrorRate
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "Agent error rate is above 5% for 2 minutes"
+              description: "Check agent logs, traces, and recent failed requests."
+      - eval_time: 8m
+        alertname: AgentHighLatency
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "p95 request latency exceeds 2s"
+              description: "Check for slow tool execution, model calls, or degraded dependencies."
+      - eval_time: 8m
+        alertname: AgentToolFailureSpike
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "Tool failure spike detected"
+              description: "Review local tool execution and guardrail decisions."

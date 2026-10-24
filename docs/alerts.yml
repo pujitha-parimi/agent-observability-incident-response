@@ -1,0 +1,37 @@
+
+groups:
+  - name: agent-alerts
+    rules:
+      - alert: AgentHighErrorRate
+        expr: |
+          (
+            sum(rate(agent_requests_total{status="error"}[5m]))
+            /
+            clamp_min(sum(rate(agent_requests_total[5m])), 0.001)
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Agent error rate is above 5% for 2 minutes"
+          description: "Check agent logs, traces, and recent failed requests."
+
+      - alert: AgentHighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(agent_request_latency_seconds_bucket[5m])) by (le)) > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 request latency exceeds 2s"
+          description: "Check for slow tool execution, model calls, or degraded dependencies."
+
+      - alert: AgentToolFailureSpike
+        expr: |
+          sum(increase(agent_tool_failures_total[5m])) > 3
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tool failure spike detected"
+          description: "Review local tool execution and guardrail decisions."
